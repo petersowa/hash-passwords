@@ -19,12 +19,12 @@ const argv = require('yargs')
     },
     argv => {
       console.log('Hash of ' + '[' + argv.password + ']');
-      hashPassword2(argv.password);
+      hashPassword2(argv.password, argv.rounds);
     }
   )
   .command(
-    'check <hash> [password]',
-    'compare <hash> to [password]',
+    'check [hash] [password]',
+    'compare [hash] to [password]',
     yargs => {
       yargs
         .positional('hash', {
@@ -41,10 +41,12 @@ const argv = require('yargs')
       matchPasswordHash(argv.password, argv.hash);
     }
   )
+  .version()
   .help().argv;
 
-function hashPassword(textPassword) {
-  bcrypt.genSalt(10, (err, salt) => {
+function hashPassword(textPassword, rounds = 12) {
+  console.log('rounds', rounds);
+  bcrypt.genSalt(rounds, (err, salt) => {
     if (!err) {
       bcrypt.hash(textPassword, salt, (err, hash) => {
         if (!err) {
@@ -56,9 +58,10 @@ function hashPassword(textPassword) {
 }
 
 //using promises?
-function hashPassword2(textPassword) {
+function hashPassword2(textPassword, rounds = 10) {
+  console.log('rounds', rounds);
   bcrypt
-    .genSalt(10)
+    .genSalt(rounds)
     .then(salt => {
       bcrypt
         .hash(textPassword, salt)
